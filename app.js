@@ -1,7 +1,8 @@
 var fs = require('fs');
-var http = require('http');
 var express = require('express');
 var app = express();
+var server = require('http').Server(app);
+var port = process.env.PORT || 8080;
 var bodyParser = require('body-parser');
 var compression = require('compression');
 
@@ -18,4 +19,6 @@ app.use(express.static(__dirname + '/public', {
 
 require('./routes')(app);
 
-var server = http.createServer(app).listen(8080);
+server.listen(port, function () {
+    console.log('Started delightfulr on :*' + port);
+});
