@@ -5,12 +5,12 @@ class AjaxCall {
         this.data = "";
     }
 
-    getStatus(phrase) {
+    getStatus(phrase, callback) {
         $.ajax({
             type: 'GET',
             contentType: 'application/json',
             url: `${this.post}${AjaxCall.removeAllSpecialCharacters(phrase)}`,
-            success: (data) => this.onMessage(data)
+            success: (data) => this.onMessage(data, callback)
         });
     }
 
@@ -18,8 +18,9 @@ class AjaxCall {
         return phrase;
     }
 
-    onMessage(data) {
+    onMessage(data, callback) {
         this.data = data;
-        console.log(`${this.name}=${JSON.stringify(data)}`);
+        //console.log(`${this.name}=${JSON.stringify(data)}`);
+        callback(data);
     }
 }
