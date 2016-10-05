@@ -65,8 +65,21 @@ var TweetCube = function () {
 
             var ID = "cube" + this.count++;
             var step = 1;
+            var max = 0.5;
+            var min = -0.5;
+            var comparative = sentiment.comparative;
 
-            $("#main").append("<div class=\"text-center col-xs-10 col-sm-10 col-md-6 col-lg-6 col-md-offset-3 col-sm-offset-1 col-xs-offset-1 sentiment_box\"><div class=\"cube-wrap example4\"><div id=\"" + ID + "\" class=\"cube\"><div class=\"cube-front\"><blockquote class=\"twitter-tweet\"><p id=\"content\">" + phrase + "</p><p id=\"screen-name\">\"" + screenName + "\"</p> </blockquote> </div><div class=\"cube-bottom\"></div></div> </div></div>");
+            if (comparative > max) comparative = max;else if (comparative < min) comparative = min;
+
+            var normalised = 1 - (comparative - min) / (max - min);
+            console.log(comparative, normalised, TweetCube.getColor(normalised));
+
+            var lCol = 8,
+                lSet = (12 - lCol) / 2,
+                sCol = 10,
+                sSet = (12 - sCol) / 2;
+
+            $("#main").append("<div class=\"text-center col-xs-" + sCol + " col-sm-" + sCol + " col-md-" + lCol + " col-lg-" + lCol + " col-md-offset-" + lSet + " col-sm-offset-" + sSet + " col-xs-offset-" + sSet + " sentiment_box\"><div class=\"cube-wrap example4\"><div id=\"" + ID + "\" class=\"cube\"><div class=\"cube-front\"><blockquote class=\"twitter-tweet\"><p id=\"content\">" + phrase + "</p><p id=\"screen-name\">\"" + screenName + "\"</p> </blockquote> </div><div class=\"cube-bottom\" style=\"background-color: " + TweetCube.getColor(normalised) + ";\"></div></div> </div></div>");
             $('#' + ID).addClass('step1').on('click', function () {
                 var old = step;
                 step = step > 1 ? 1 : 2;
@@ -78,6 +91,16 @@ var TweetCube = function () {
         value: function removeAll() {
             $(".sentiment_box").remove();
         }
+    }], [{
+        key: "getColor",
+        value: function getColor(value) {
+            var useFixed = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+            //value from 0 to 1
+            if (useFixed) return ["#B6A39E", "#D0D1AC", "#DCDDC7"][value < 0.33 ? 0 : value < 0.667 ? 1 : 2];
+
+            return "hsl(" + ((1 - value) * 120).toString(10) + ",50%,65%)";
+        }
     }]);
 
     return TweetCube;
@@ -87,12 +110,12 @@ var TweetCube = function () {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 var twitterFeed = new AjaxCall("/getTweets/");
-var tweets = new TweetCube();
+var tweetCube = new TweetCube();
 
 $(document).ready(function () {
     $("#input").submit(function (event) {
         $("#main").removeClass("vertical-center-row");
-        tweets.removeAll();
+        tweetCube.removeAll();
         twitterFeed.getStatus(document.getElementById("search").value, parseResponse);
         return false;
     });
@@ -104,7 +127,7 @@ function parseResponse(response) {
     } else if ((typeof response === "undefined" ? "undefined" : _typeof(response)) == 'object') {
         console.log(response);
         response.tweets.forEach(function (item) {
-            return tweets.createCube(item.tweet, "— " + response.name + " (@" + response.screen_name + ")");
+            return tweetCube.createCube(item.tweet, "— " + response.name + " (@" + response.screen_name + ")", item.sentiment);
         });
     }
 }
