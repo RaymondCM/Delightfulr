@@ -45,73 +45,66 @@ var AjaxCall = function () {
 }();
 "use strict";
 
-var sentiment = new AjaxCall("/getSentiment/");
-var tweets = new AjaxCall("/getTweets/");
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var currentUser = {};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TweetCube = function () {
+    function TweetCube() {
+        _classCallCheck(this, TweetCube);
+
+        this.count = 0;
+    }
+
+    _createClass(TweetCube, [{
+        key: "createCube",
+        value: function createCube() {
+            var phrase = arguments.length <= 0 || arguments[0] === undefined ? "Tweets and links" : arguments[0];
+            var screenName = arguments.length <= 1 || arguments[1] === undefined ? "— Screen Name (@ID)" : arguments[1];
+            var sentiment = arguments[2];
+
+            var ID = "cube" + this.count++;
+            var step = 1;
+
+            $("#main").append("<div class=\"text-center col-xs-10 col-sm-10 col-md-6 col-lg-6 col-md-offset-3 col-sm-offset-1 col-xs-offset-1 sentiment_box\"><div class=\"cube-wrap example4\"><div id=\"" + ID + "\" class=\"cube\"><div class=\"cube-front\"><blockquote class=\"twitter-tweet\"><p id=\"content\">" + phrase + "</p><p id=\"screen-name\">\"" + screenName + "\"</p> </blockquote> </div><div class=\"cube-bottom\"></div></div> </div></div>");
+            $('#' + ID).addClass('step1').on('click', function () {
+                var old = step;
+                step = step > 1 ? 1 : 2;
+                $('#' + ID).addClass('step' + step).removeClass('step' + old);
+            });
+        }
+    }, {
+        key: "removeAll",
+        value: function removeAll() {
+            $(".sentiment_box").remove();
+        }
+    }]);
+
+    return TweetCube;
+}();
+"use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+var twitterFeed = new AjaxCall("/getTweets/");
+var tweets = new TweetCube();
 
 $(document).ready(function () {
-    //sentiment.getStatus("hello how are you beautiful", () => console.log("hello"));
-    //tweets.getStatus("_tabbby", (data) => console.log(rawStreamToTweets(data.value)));
-
-
     $("#input").submit(function (event) {
-        console.log(document.getElementById("search").value);
         $("#main").removeClass("vertical-center-row");
-        $(".sentiment_box").remove();
-        tweets.getStatus(document.getElementById("search").value, function (data) {
-            return rawStreamToTweets(data.value);
-        });
+        tweets.removeAll();
+        twitterFeed.getStatus(document.getElementById("search").value, parseResponse);
         return false;
     });
 });
-var count = 0;
 
-function createCube() {
-    var phrase = arguments.length <= 0 || arguments[0] === undefined ? "Tweets and links" : arguments[0];
-    var screenName = arguments.length <= 1 || arguments[1] === undefined ? "— Screen Name (@ID)" : arguments[1];
-    var sentiment = arguments[2];
-
-    var ID = "cube" + count++;
-    var step = 1;
-
-    $("#main").append("<div class=\"text-center col-xs-10 col-sm-10 col-md-6 col-lg-6 col-md-offset-3 col-sm-offset-1 col-xs-offset-1 sentiment_box\"><div class=\"cube-wrap example4\"><div id=\"" + ID + "\" class=\"cube\"><div class=\"cube-front\"><blockquote class=\"twitter-tweet\"><p id=\"content\">" + phrase + "</p><p id=\"screen-name\">\"" + screenName + "\"</p> </blockquote> </div><div class=\"cube-bottom\"></div></div> </div></div>");
-    $('#' + ID).addClass('step1').on('click', function () {
-        var old = step;
-        step = step > 1 ? 1 : 2;
-        $('#' + ID).addClass('step' + step).removeClass('step' + old);
-    });
-
-    //document.getElementById("main").appendChild(container);
-}
-
-function rawStreamToTweets(data) {
-    var statuses = [];
-    var user = "",
-        screenName = "";
-
-    if (data) {
-        data = JSON.parse(data);
-        if (data.length > 0) {
-            screenName = data[0].user.screen_name;
-            user = data[0].user.name;
-        }
-
-        for (var i = 0; i < data.length; ++i) {
-            statuses.push(data[i].text);
-        }
-    }
-    var final = [];
-    statuses.forEach(function (item, index, array) {
-        return sentiment.getStatus(item.replace(/[^a-zA-Z0-9+]/g, " "), function (data) {
-            final.push({
-                tweet: item,
-                sentiment: data.value
-            });
-            createCube(item, "— " + user + " (@" + screenName + ")");
+function parseResponse(response) {
+    if (typeof response == 'string') {
+        console.log("No Response Recieved: ", response);
+    } else if ((typeof response === "undefined" ? "undefined" : _typeof(response)) == 'object') {
+        console.log(response);
+        response.tweets.forEach(function (item) {
+            return tweets.createCube(item.tweet, "— " + response.name + " (@" + response.screen_name + ")");
         });
-    });
-
-    console.log(final);
-    return final;
+    }
 }
