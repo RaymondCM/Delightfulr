@@ -1,17 +1,4 @@
 var sentiment = require('sentiment');
-
-//Callback functions
-var error = function (err, response, body) {
-    console.log('ERROR [%s]', err);
-};
-var success = function (data) {
-    data = JSON.parse(data);
-    var statuses = [];
-    for (let i = 0; i < data.length; ++i)
-        statuses.push(data[i].text);
-    console.log('Data [%s]', statuses);
-};
-
 var Twitter = require('twitter-node-client').Twitter;
 
 //Get this data from your twitter apps dashboard
@@ -37,29 +24,60 @@ module.exports = (app, pir, gestures) => {
         next();
     });
 
-    app.get('/getSentiment/:phrase', (req, res) => {
-        if (!req.body) return res.sendStatus(400)
-        res.send({
-            "value": sentiment(req.params.phrase)
-        });
-    });
-
     app.get('/getTweets/:user', (req, res) => {
         if (!req.body) return res.sendStatus(400)
-        var user = req.params.user;
 
-        twitter.getCustomApiCall('/users/lookup.json', {
-            screen_name: user
-        }, error, () => {
-            twitter.getUserTimeline({
-                screen_name: user,
-                count: '3'
-            }, error, (data) => {
-                //console.log("sending", data);
-                res.send({
-                    "value": data
+        if (isValidTwitterScreenName(req.params.user)) {
+            var options = {
+                screen_name: req.params.user
+            };
+
+            var error = function (err, response, body) {
+                res.send("Error " + err);
+                console.log('ERROR [%s]', err);
+            };
+
+            twitter.getCustomApiCall('/users/lookup.json', options, error, () => {
+                twitter.getUserTimeline({
+                    screen_name: req.params.user,
+                    count: '3'
+                }, error, response => {
+                    try {
+                        var tweets = [];
+                        var user = "";
+                        var screenName = "";
+
+                        response = JSON.parse(response);
+
+                        if (response.length > 0) {
+                            screenName = response[0].user.screen_name;
+                            user = response[0].user.name;
+                        }
+
+                        for (let i = 0; i < response.length; ++i) {
+                            tweets.push({
+                                tweet: response[i].text,
+                                sentiment: sentiment(response[i].text)
+                            });
+                        }
+
+                        res.send({
+                            name: user,
+                            screen_name: screenName,
+                            tweets: tweets
+                        });
+                    } catch (error) {
+                        console.log(`Error: ${error}`);
+                        res.send(`Error: ${error}`);
+                    }
                 });
             });
-        });
+        } else {
+            res.send("Invalid Screen Name");
+        }
     });
+}
+
+function isValidTwitterScreenName(name) {
+    return !new RegExp("^@?(\w){1,15}$").test(name);
 }
