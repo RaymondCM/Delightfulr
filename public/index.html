@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Bomber Command Project</title>
+    <title>DelightFulr</title>
 
     <!-- JQuery (Ajax, Animation etc.) -->
     <script src="js/lib/jquery.min.js"></script>
@@ -15,18 +15,29 @@
 
     <!-- Load StyleSheet-->
     <link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body>
 
-    <div class="panel panel-warning">
-        <div class="panel-heading">
+    <div class="container container-table">
+        <div class="row vertical-center-row" id="main">
 
-        </div>
-        <div class=col-sm-12>
+            <div class="text-center col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2">
+                <h3>How delightfulr is?</h3>
+                <form id="input" onsubmit="return false">
+                    <input type="text" name="TwitterName" id="search" class="form-control" value="" required="required" pattern="^@?(\w){1,15}$"
+                        title="Twitter Username">
+                </form>
+
+            </div>
+
 
         </div>
     </div>
+
+
+
 
 </body>
 
