@@ -33,9 +33,15 @@ class TweetCube {
             var old = step
             step = step > 1 ? 1 : 2;
             $('#' + ID).addClass('step' + step).removeClass('step' + old);
-        }).unbind();
+        });
         
         if(this.clearCut)
+$('#' + ID).addClass('step1').on('click', () => {
+            var old = step
+            step = step > 1 ? 1 : 2;
+            $('#' + ID).addClass('step' + step).removeClass('step' + old);
+        }).unbind();
+
             $('#' + ID).hover(() => {
             step = 2;
             $('#' + ID).addClass('step2').removeClass('step1');
