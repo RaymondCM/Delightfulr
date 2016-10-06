@@ -33,14 +33,19 @@ module.exports = (app, pir, gestures) => {
                 screen_name: req.params.user
             };
 
+            var noUser = function (err, response, body) {
+                res.send("User doesn't exist.");
+                console.log('ERROR [%s]', err);
+            };
+
             var error = function (err, response, body) {
-                res.send("Error " + err);
+                res.send("Couldn't get that users timeline.");
                 console.log('ERROR [%s]', err);
             };
 
             var cObj = cache.get(req.params.user);
             if(cObj == null) {
-                twitter.getCustomApiCall('/users/lookup.json', options, error, () => {
+                twitter.getCustomApiCall('/users/lookup.json', options, noUser, () => {
                    twitter.getUserTimeline({
                         screen_name: req.params.user,
                         exclude_replies: true,
@@ -66,7 +71,8 @@ module.exports = (app, pir, gestures) => {
                                 });
                             }
 
-                            var tObj = {
+if(tweets.length > 0){
+                var tObj = {
                                 name: user,
                                 screen_name: screenName,
                                 tweets: tweets
@@ -78,6 +84,10 @@ module.exports = (app, pir, gestures) => {
                             });
 
                             res.send(tObj);
+} else {
+    res.send("No tweets available for this user.")
+}
+                           
                         } catch (error) {
                             console.log(`Error: ${error}`);
                             res.send(`Error: ${error}`);

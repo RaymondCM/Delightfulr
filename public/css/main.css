@@ -315,7 +315,7 @@ blockquote.twitter-tweet a:focus {
 .mainCube .cube-bottom {
   transform: rotateX(-90deg) translateZ(75px);
   -moz-transform: rotateX(-90deg) translateZ(75px);
-  -webkit-transform: rotateX(-90deg) translateZ(75px);
+  -webkit-transform: rotateX(-90deg) translateZ(75px); 
   -o-transform: rotateX(-90deg) translateZ(75px);
   -ms-transform: rotateX(-90deg) translateZ(75px);
   background-color: #B6A39E;
