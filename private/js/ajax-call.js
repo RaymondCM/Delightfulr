@@ -20,7 +20,6 @@ class AjaxCall {
 
     onMessage(data, callback) {
         this.data = data;
-        //console.log(`${this.name}=${JSON.stringify(data)}`);
         callback(data);
     }
 }

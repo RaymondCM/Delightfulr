@@ -28,9 +28,8 @@ $(document).ready(() => {
 
 function parseResponse(response) {
     if (typeof response == 'string') {
-        console.log("No Response Recieved: ", response)
+        alert(response);
     } else if (typeof response == 'object') {
-        console.log(response);
         response.tweets.forEach(item => tweetCube.createCube(item.tweet, `— ${response.name} (@${response.screen_name})`, item.sentiment));
     }
 }

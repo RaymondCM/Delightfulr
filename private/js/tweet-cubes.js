@@ -23,7 +23,7 @@ class TweetCube {
 
         var lCol = 8,
             lSet = (12 - lCol) / 2,
-            sCol = 10,
+            sCol = 12,
             sSet = (12 - sCol) / 2;
 
         
@@ -50,7 +50,6 @@ class TweetCube {
     }
 
     getColor(v) {
-        console.log(1 - v);
         return this.clearCut ? this.theme[1 - v < 0.33 ? 0 : 1 - v < 0.667 ? 1 : 2] : `hsl(${(( 1 - v) * 120).toString(10)},100%,70%)`;
     }
 }
