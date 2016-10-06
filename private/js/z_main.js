@@ -22,7 +22,7 @@ $(document).ready(() => {
             $("#worst").css('background-color', tweetCube.theme[0]);
             $("#average").css('background-color', tweetCube.theme[1]);
             $("#best").css('background-color', tweetCube.theme[2]);
-        }
+        } 
     });
 });
 
