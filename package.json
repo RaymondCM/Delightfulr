@@ -10,6 +10,7 @@
     "compression": "^1.6.2",
     "express": "~4.13.4",
     "leapjs": "^0.6.4",
+    "memory-cache": "^0.1.6",
     "onoff": "^1.1.1",
     "path": "^0.12.7",
     "pem": "^1.8.3",

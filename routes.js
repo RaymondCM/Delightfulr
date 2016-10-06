@@ -1,5 +1,6 @@
 var sentiment = require('sentiment');
 var Twitter = require('twitter-node-client').Twitter;
+var cache = require('memory-cache');
 
 //Get this data from your twitter apps dashboard
 var config = {
@@ -37,41 +38,55 @@ module.exports = (app, pir, gestures) => {
                 console.log('ERROR [%s]', err);
             };
 
-            twitter.getCustomApiCall('/users/lookup.json', options, error, () => {
-                twitter.getUserTimeline({
-                    screen_name: req.params.user,
-                    count: '3'
-                }, error, response => {
-                    try {
-                        var tweets = [];
-                        var user = "";
-                        var screenName = "";
+            var cObj = cache.get(req.params.user);
+            if(cObj == null) {
+                twitter.getCustomApiCall('/users/lookup.json', options, error, () => {
+                   twitter.getUserTimeline({
+                        screen_name: req.params.user,
+                        exclude_replies: true,
+                        include_rts: false,
+                        count: '15'
+                    }, error, response => {
+                        try {
+                            var tweets = [];
+                            var user = "";
+                            var screenName = "";
 
-                        response = JSON.parse(response);
+                            response = JSON.parse(response);
 
-                        if (response.length > 0) {
-                            screenName = response[0].user.screen_name;
-                            user = response[0].user.name;
-                        }
+                            if (response.length > 0) {
+                                screenName = response[0].user.screen_name;
+                                user = response[0].user.name;
+                            }
 
-                        for (let i = 0; i < response.length; ++i) {
-                            tweets.push({
-                                tweet: response[i].text,
-                                sentiment: sentiment(response[i].text)
+                            for (let i = 0; i < response.length; ++i) {
+                                tweets.push({
+                                    tweet: response[i].text,
+                                    sentiment: sentiment(response[i].text)
+                                });
+                            }
+
+                            var tObj = {
+                                name: user,
+                                screen_name: screenName,
+                                tweets: tweets
+                            };
+
+                            console.log(`Caching User "${req.params.user}"`);
+                            cache.put(req.params.user, tObj, 5 * 60 * 1000, function(key, value) {
+                                console.log(`Deleted User "${key}"`);
                             });
-                        }
 
-                        res.send({
-                            name: user,
-                            screen_name: screenName,
-                            tweets: tweets
-                        });
-                    } catch (error) {
-                        console.log(`Error: ${error}`);
-                        res.send(`Error: ${error}`);
-                    }
+                            res.send(tObj);
+                        } catch (error) {
+                            console.log(`Error: ${error}`);
+                            res.send(`Error: ${error}`);
+                        }
+                    });
                 });
-            });
+            } else {
+                res.send(cObj);
+            }
         } else {
             res.send("Invalid Screen Name");
         }

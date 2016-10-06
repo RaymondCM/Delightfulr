@@ -1,6 +1,10 @@
 class TweetCube {
     constructor() {
         this.count = 0;
+        this.clearCut = false;
+        this.lollypop = ["#FF7F7F", "#FFFF7F", "#3FFF7F"];
+        this.scheme = ["#B6A39E", "#D0D1AC", "#DCDDC7"];
+        this.theme = this.lollypop;
     }
 
     createCube(phrase = "Tweets and links", screenName = "— Screen Name (@ID)", sentiment) {
@@ -16,18 +20,28 @@ class TweetCube {
             comparative = min;
 
         var normalised = 1 - ((comparative - min) / (max - min));
-        console.log(comparative, normalised, TweetCube.getColor(normalised));
 
         var lCol = 8,
             lSet = (12 - lCol) / 2,
             sCol = 10,
             sSet = (12 - sCol) / 2;
 
-        $("#main").append(`<div class="text-center col-xs-${sCol} col-sm-${sCol} col-md-${lCol} col-lg-${lCol} col-md-offset-${lSet} col-sm-offset-${sSet} col-xs-offset-${sSet} sentiment_box"><div class="cube-wrap example4"><div id="${ID}" class="cube"><div class="cube-front"><blockquote class="twitter-tweet"><p id="content">${phrase}</p><p id="screen-name">"${screenName}"</p> </blockquote> </div><div class="cube-bottom" style="background-color: ${TweetCube.getColor(normalised)};"></div></div> </div></div>`);
+        
+        $("#main").append(`<div class="text-center col-xs-${sCol} col-sm-${sCol} col-md-${lCol} col-lg-${lCol} col-md-offset-${lSet} col-sm-offset-${sSet} col-xs-offset-${sSet} sentiment_box"><div class="cube-wrap mainCube"><div id="${ID}" class="cube"><div class="cube-front"><blockquote class="twitter-tweet"><p id="content">${phrase}</p><p id="screen-name">"${screenName}"</p> </blockquote> </div><div class="cube-bottom" style="background-color: ${this.getColor(normalised)};"><h3>${["The Worst!", "Awful!", "Bad!", "Average", "Okay", "Good", "Perfect"][Math.round((1 - normalised) * 6) > 6 ? 6 : Math.round((1 - normalised) * 6) <= 0 ? 0 : Math.round((1 - normalised) * 6)]}</h3></div></div> </div></div>`);
+        
         $('#' + ID).addClass('step1').on('click', () => {
             var old = step
             step = step > 1 ? 1 : 2;
             $('#' + ID).addClass('step' + step).removeClass('step' + old);
+        });
+        
+        if(this.clearCut)
+            $('#' + ID).hover(() => {
+            step = 2;
+            $('#' + ID).addClass('step2').removeClass('step1');
+        }, () => {
+            step = 1;
+            $('#' + ID).addClass('step1').removeClass('step2');
         });
     }
 
@@ -35,11 +49,8 @@ class TweetCube {
         $(".sentiment_box").remove();
     }
 
-    static getColor(value, useFixed = false) {
-        //value from 0 to 1
-        if (useFixed)
-            return ["#B6A39E", "#D0D1AC", "#DCDDC7"][value < 0.33 ? 0 : value < 0.667 ? 1 : 2];
-
-        return `hsl(${((1 - value) * 120).toString(10)},50%,65%)`;
+    getColor(v) {
+        console.log(1 - v);
+        return this.clearCut ? this.theme[1 - v < 0.33 ? 0 : 1 - v < 0.667 ? 1 : 2] : `hsl(${(( 1 - v) * 120).toString(10)},100%,70%)`;
     }
 }
