@@ -29,14 +29,10 @@ class TweetCube {
         
         $("#main").append(`<div class="text-center col-xs-${sCol} col-sm-${sCol} col-md-${lCol} col-lg-${lCol} col-md-offset-${lSet} col-sm-offset-${sSet} col-xs-offset-${sSet} sentiment_box"><div class="cube-wrap mainCube"><div id="${ID}" class="cube"><div class="cube-front"><blockquote class="twitter-tweet"><p id="content">${phrase}</p><p id="screen-name">"${screenName}"</p> </blockquote> </div><div class="cube-bottom" style="background-color: ${this.getColor(normalised)};"><h3>${["The Worst!", "Awful!", "Bad!", "Average", "Okay", "Good", "Perfect"][Math.round((1 - normalised) * 6) > 6 ? 6 : Math.round((1 - normalised) * 6) <= 0 ? 0 : Math.round((1 - normalised) * 6)]}</h3></div></div> </div></div>`);
         
-        $('#' + ID).addClass('step1').on('click', () => {
-            var old = step
-            step = step > 1 ? 1 : 2;
-            $('#' + ID).addClass('step' + step).removeClass('step' + old);
-        });
+        $('#' + ID).unbind();
         
-        if(this.clearCut)
-$('#' + ID).addClass('step1').on('click', () => {
+        if(this.clearCut) {
+        $('#' + ID).addClass('step1').on('click', () => {
             var old = step
             step = step > 1 ? 1 : 2;
             $('#' + ID).addClass('step' + step).removeClass('step' + old);
@@ -48,7 +44,15 @@ $('#' + ID).addClass('step1').on('click', () => {
         }, () => {
             step = 1;
             $('#' + ID).addClass('step1').removeClass('step2');
+        }); 
+    }
+        else
+        $('#' + ID).addClass('step1').on('click', () => {
+            var old = step
+            step = step > 1 ? 1 : 2;
+            $('#' + ID).addClass('step' + step).removeClass('step' + old);
         });
+
     }
 
     removeAll() {
