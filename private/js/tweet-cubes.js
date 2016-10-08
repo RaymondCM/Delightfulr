@@ -26,7 +26,7 @@ class TweetCube {
             sSet = (12 - sCol) / 2;
 
 
-        $("#main").append(`<div class="text-center col-xs-${sCol} col-sm-${sCol} col-md-${lCol} col-lg-${lCol} col-md-offset-${lSet} col-sm-offset-${sSet} col-xs-offset-${sSet} sentiment_box"><div class="cube-wrap mainCube"><div id="${ID}" class="cube"><div class="cube-front"><blockquote class="twitter-tweet"><p id="content">${twemoji.parse(phrase)}</p><p id="screen-name">"${screenName}"</p> </blockquote> </div><div class="cube-bottom" style="background-color: ${this.getColor(normalised)};"><h3>${["The Worst!", "Not Good!", "Bad!", "Average", "Okay", "Good", "Perfect"][Math.round((1 - normalised) * 6) > 6 ? 6 : Math.round((1 - normalised) * 6) <= 0 ? 0 : Math.round((1 - normalised) * 6)]} ${"</br>" + parseFloat(Math.round(10000 * (1 - normalised)) / 100).toFixed(2) + "%"}</h3></div></div> </div></div>`);
+        $("#main").append(`<div class="text-center col-xs-${sCol} col-sm-${sCol} col-md-${lCol} col-lg-${lCol} col-md-offset-${lSet} col-sm-offset-${sSet} col-xs-offset-${sSet} sentiment_box"><div class="cube-wrap mainCube"><div id="${ID}" class="cube"><div class="cube-front"><blockquote class="twitter-tweet"><p id="content">${twemoji.parse(phrase)}</p><p id="screen-name">${screenName}</p> </blockquote> </div><div class="cube-bottom" style="background-color: ${this.getColor(normalised)};"><h3>${["The Worst!", "Not Good!", "Bad!", "Average", "Okay", "Good", "Perfect"][Math.round((1 - normalised) * 6) > 6 ? 6 : Math.round((1 - normalised) * 6) <= 0 ? 0 : Math.round((1 - normalised) * 6)]} ${"</br>" + parseFloat(Math.round(10000 * (1 - normalised)) / 100).toFixed(2) + "%"}</h3></div></div> </div></div>`);
 
         $('#' + ID).unbind();
 
