@@ -44,9 +44,9 @@ module.exports = (app, pir, gestures) => {
             };
 
             var cObj = cache.get(req.params.user);
-            if(cObj == null) {
+            if (cObj == null) {
                 twitter.getCustomApiCall('/users/lookup.json', options, noUser, () => {
-                   twitter.getUserTimeline({
+                    twitter.getUserTimeline({
                         screen_name: req.params.user,
                         exclude_replies: true,
                         include_rts: false,
@@ -71,23 +71,23 @@ module.exports = (app, pir, gestures) => {
                                 });
                             }
 
-if(tweets.length > 0){
-                var tObj = {
-                                name: user,
-                                screen_name: screenName,
-                                tweets: tweets
-                            };
+                            if (tweets.length > 0) {
+                                var tObj = {
+                                    name: user,
+                                    screen_name: screenName,
+                                    tweets: tweets
+                                };
 
-                            console.log(`Caching User "${req.params.user}"`);
-                            cache.put(req.params.user, tObj, 5 * 60 * 1000, function(key, value) {
-                                console.log(`Deleted User "${key}"`);
-                            });
+                                console.log(`Caching User "${req.params.user}"`);
+                                cache.put(req.params.user, tObj, 5 * 60 * 1000, function (key, value) {
+                                    console.log(`Deleted User "${key}"`);
+                                });
 
-                            res.send(tObj);
-} else {
-    res.send("No tweets available for this user.")
-}
-                           
+                                res.send(tObj);
+                            } else {
+                                res.send("No tweets available for this user.")
+                            }
+
                         } catch (error) {
                             console.log(`Error: ${error}`);
                             res.send(`Error: ${error}`);
