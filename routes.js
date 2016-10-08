@@ -1,4 +1,4 @@
-var sentiment = require('sentiment');
+var sentiment = require('./sentiment');
 var Twitter = require('twitter-node-client').Twitter;
 var cache = require('memory-cache');
 
